@@ -4,72 +4,83 @@ import Button from "../components/button";
 
 export default function Login() {
   const navigate = useNavigate();
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    // 🔐 Simple role condition
-    if (username === "admin" && password === "admin123") {
-      navigate("/admin-dashboard");
-    } else if (username && password) {
-      navigate("/admin-dashboard");
-    } else {
-      alert("Please enter username and password");
+    try {
+      const res = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // ✅ store data in localStorage
+        localStorage.setItem("token", data.token);
+        console.log("Token stored:", data.token); // Debug log
+        localStorage.setItem("role", data.user.role);
+        localStorage.setItem("id", data.user.id);
+        localStorage.setItem("isLoggedIn", "true");
+
+        alert("Login successful");
+
+        // ✅ role-based navigation
+        if (data.user.role === "admin") {
+          navigate("/admin-dashboard");
+        } else {
+          navigate("/user-dashboard");
+        }
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Server error");
     }
   };
 
+ 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
-
-        {/* Title */}
-        <h2 className="text-2xl font-bold text-gray-800 text-center">
+        <h2 className="text-2xl font-bold text-center">
           Contract Management System
         </h2>
         <p className="text-gray-500 text-center mt-1">
           Please login to continue
         </p>
 
-        {/* Form */}
         <form className="mt-6 space-y-4" onSubmit={handleLogin}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Username
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 w-full px-4 py-2 border rounded-lg"
-              placeholder="Enter username"
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Username"
+            className="w-full px-4 py-2 border rounded-lg"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full px-4 py-2 border rounded-lg"
-              placeholder="Enter password"
-            />
-          </div>
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-2 border rounded-lg"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-          
-            <Button text="Login" onClick={handleLogin} type="submit" style={{backgroundColor:"indigo"}}/>
-           {/* <Button text="Login" onClick={handleLogin} type="submit" /> */}
+          <Button text="Login" type="submit" />
         </form>
 
-        <p className="text-sm text-center text-gray-500 mt-4">
+        <p className="text-center mt-4">
           Don’t have an account?{" "}
           <span
-            className="text-indigo-600 font-medium cursor-pointer"
+            className="text-indigo-600 cursor-pointer"
             onClick={() => navigate("/register")}
           >
             Register

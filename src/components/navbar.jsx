@@ -12,6 +12,7 @@ export default function Navbar() {
   const [active, setActive] = useState("dashboard");
   const [open, setOpen] = useState(false);
 const navigate = useNavigate();
+const role = localStorage.getItem("role");
   const navItem = (name, label, Icon) => (
     <div
       onClick={() => {
@@ -30,6 +31,11 @@ const navigate = useNavigate();
       <span className="text-lg">{label}</span>
     </div>
   );
+   const logout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
+
 
   return (
     <div className="bg-white shadow-sm px-6 py-3">
@@ -59,13 +65,15 @@ const navigate = useNavigate();
         <div className="hidden md:flex items-center gap-4">
           <div className="flex gap-2 px-4 py-2 bg-gray-100 rounded-lg items-center">
             <MdOutlinePerson />
-            <span className="text-sm">admin</span>
+            <span className="text-sm">{role}</span>
             <span className="px-2 py-1 text-xs bg-indigo-600 text-white rounded">
-              ADMIN
+              {role}
             </span>
           </div>
 
-          <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg text-gray-600 hover:text-red-500">
+          <button 
+          onClick={logout}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg text-gray-600 hover:text-red-500">
             <IoIosLogOut />
             Logout
           </button>
