@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AiOutlineClose, AiOutlineSave } from 'react-icons/ai';
+import axios from "axios";   // ✅ ADDED
 
 const AddNewContract = () => {
   const navigate = useNavigate();
@@ -28,12 +29,49 @@ const AddNewContract = () => {
     navigate('/contract-page');
   };
 
-  const handleSubmit = (e) => {
+  // ✅ API ADDED (UI NOT TOUCHED)
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your create logic here
-    console.log('New contract data:', formData);
-    // Navigate back after successful creation
-    navigate('/contract-page');
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please log in to create a contract.");
+        return;
+      }
+
+      const response = await axios.post(
+        "http://localhost:5000/api/contracts/create",
+        {
+          contract_name: formData.name,
+          contract_type: formData.type,
+          client_name: formData.client,
+          start_date: formData.startDate,
+          end_date: formData.endDate,
+          status: "Pending",
+          amount: formData.value,
+          description: formData.description,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Contract created:", response.data);
+
+      // Navigate back after successful creation
+      navigate('/contract-page');
+
+    } catch (error) {
+      console.error(
+        "Error creating contract:",
+        error.response?.data || error.message
+      );
+      alert(error.response?.data?.message || "Failed to create contract");
+    }
   };
 
   return (
@@ -42,8 +80,12 @@ const AddNewContract = () => {
         <div className="bg-white rounded-xl shadow-sm p-8">
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Add New Contract</h1>
-            <p className="text-gray-600">Fill in the details to create a new contract</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Add New Contract
+            </h1>
+            <p className="text-gray-600">
+              Fill in the details to create a new contract
+            </p>
           </div>
 
           {/* Form */}
@@ -64,9 +106,8 @@ const AddNewContract = () => {
               />
             </div>
 
-            {/* Contract Type and Client/Vendor Name - Two columns */}
+            {/* Contract Type and Client/Vendor Name */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {/* Contract Type */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Contract Type *
@@ -83,13 +124,10 @@ const AddNewContract = () => {
                   <option value="Employment Contract">Employment Contract</option>
                   <option value="Partnership Agreement">Partnership Agreement</option>
                   <option value="Lease Agreement">Lease Agreement</option>
-                  <option value="Partnership Agreement">Other</option>
-
-
+                  <option value="Other">Other</option>
                 </select>
               </div>
 
-              {/* Client/Vendor Name */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Client/Vendor Name *
@@ -106,9 +144,8 @@ const AddNewContract = () => {
               </div>
             </div>
 
-            {/* Start Date and End Date - Two columns */}
+            {/* Dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {/* Start Date */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Start Date *
@@ -123,7 +160,6 @@ const AddNewContract = () => {
                 />
               </div>
 
-              {/* End Date */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   End Date *
@@ -183,9 +219,10 @@ const AddNewContract = () => {
                 <AiOutlineClose size={18} />
                 Cancel
               </button>
+
               <button
                 type="submit"
-                style={{backgroundColor:"#5b5dfc"}}
+                style={{ backgroundColor: "#5b5dfc" }}
                 className="flex items-center gap-2 text-white px-6 py-3 rounded-lg hover:opacity-90 transition-colors font-medium"
               >
                 <AiOutlineSave size={18} />

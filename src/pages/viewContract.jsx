@@ -68,7 +68,7 @@ const ContractDetail = () => {
               style={{backgroundColor:"#ef4444"}}
               className="flex items-center gap-2 text-white px-5 py-2.5 rounded-lg hover:opacity-90 transition-colors font-medium"
             >
-              <AiOutlineDelete size={18} />
+              <AiOutlineDelete size={18} /  >
               Delete
             </button>
           </div>
