@@ -2,13 +2,14 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AiOutlineEdit, AiOutlineDelete, AiOutlineArrowLeft } from 'react-icons/ai';
 import { BsFileText, BsCurrencyDollar, BsCalendar, BsBuilding, BsClock } from 'react-icons/bs';
+import axios from "axios";
 
 const ContractDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const contract = location.state?.contract;
 
-
+  const role = localStorage.getItem("role");
   // If no contract data, redirect back to list
   if (!contract) {
     navigate('/contracts');
@@ -33,14 +34,46 @@ const ContractDetail = () => {
   };
 
   const handleEdit = () => {
-    // Add edit logic here
-    console.log('Edit contract:', contract.id);
+    navigate(`/edit-contract/${contract._id}`, { state: { contract } });
+    console.log('Edit contract:', contract._id);
   };
 
-  const handleDelete = () => {
-    // Add delete logic here
-    console.log('Delete contract:', contract.id);
+  
+  const handleDelete = async () => {
+
+    const id = contract._id;
+  
+    if (!window.confirm(`Delete contract "${contract.contract_name}"? This cannot be undone.`)) return;
+  
+    const token = localStorage.getItem("token");
+  
+    if (!token) {
+      alert("Please log in to delete a contract.");
+      return;
+    }
+  
+    try {
+      const response = await axios.delete(
+        `http://localhost:5000/api/contracts/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (response.data.success) {
+        alert("Contract deleted successfully");
+        navigate("/contract-page");   // redirect after delete
+      } else {
+        alert(response.data.message || "Failed to delete contract");
+      }
+    } catch (error) {
+      const msg = error.response?.data?.message || error.message;
+      alert(msg || "Failed to delete contract");
+    }
   };
+  
 
   return (
     <div className="min-h-screen bg-slate-100 p-6">
@@ -54,6 +87,8 @@ const ContractDetail = () => {
             <AiOutlineArrowLeft size={20} />
             <span className="font-medium">Back to Contracts</span>
           </button>
+          {role === "admin" ? (
+
           <div className="flex gap-3">
             <button 
               onClick={handleEdit}
@@ -72,6 +107,7 @@ const ContractDetail = () => {
               Delete
             </button>
           </div>
+          ): null}
         </div>
 
         {/* Contract Header Card */}
@@ -81,8 +117,8 @@ const ContractDetail = () => {
         >
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
             <div>
-              <div className="text-2xl sm:text-4xl font-bold mb-2">{contract.name}</div>
-              <p className="text-white/90 text-lg">{contract.client}</p>
+              <div className="text-2xl sm:text-4xl font-bold mb-2">{contract.contract_name}</div>
+              <p className="text-white/90 text-lg">{contract.client_name}</p>
             </div>
             <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${getStatusBadgeColor(contract.status)}`}>
               <BsClock size={16} />
@@ -96,62 +132,62 @@ const ContractDetail = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
             {/* Contract Type */}
             <div className="flex gap-4 items-start">
-              <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <div className=" w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <BsFileText className="text-blue-600" size={24} />
               </div>
               <div>
                 <p className="text-sm text-gray-500 mb-1">Contract Type</p>
-                <p className="text-lg font-semibold text-gray-900">{contract.type}</p>
+                <p className="text-lg font-semibold text-gray-900">{contract.contract_type}</p>
               </div>
             </div>
 
             {/* Contract Value */}
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className=" w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                 <BsCurrencyDollar className="text-green-600" size={24} />
               </div>
               <div>
                 <p className="text-sm text-gray-500 mb-1">Contract Value</p>
-                <p className="text-lg font-semibold text-gray-900">{contract.value}</p>
+                <p className="text-lg font-semibold text-gray-900">{contract.amount}</p>
               </div>
             </div>
 
             {/* Start Date */}
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+              <div className=" w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                 <BsCalendar className="text-purple-600" size={24} />
               </div>
               <div>
                 <p className="text-sm text-gray-500 mb-1">Start Date</p>
-                <p className="text-lg font-semibold text-gray-900">{contract.startDate}</p>
+                <p className="text-lg font-semibold text-gray-900">{contract.start_date}</p>
               </div>
             </div>
 
             {/* End Date */}
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                 <BsCalendar className="text-orange-600" size={24} />
               </div>
               <div>
                 <p className="text-sm text-gray-500 mb-1">End Date</p>
-                <p className="text-lg font-semibold text-gray-900">{contract.endDate}</p>
+                <p className="text-lg font-semibold text-gray-900">{contract.end_date}</p>
               </div>
             </div>
 
             {/* Client/Vendor */}
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
                 <BsBuilding className="text-indigo-600" size={24} />
               </div>
               <div>
                 <p className="text-sm text-gray-500 mb-1">Client/Vendor</p>
-                <p className="text-lg font-semibold text-gray-900">{contract.client}</p>
+                <p className="text-lg font-semibold text-gray-900">{contract.client_name}</p>
               </div>
             </div>
 
             {/* Status */}
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+              <div className=" w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
                 <BsClock className="text-red-600" size={24} />
               </div>
               <div>
@@ -181,7 +217,7 @@ const ContractDetail = () => {
                 </div>
                 <div className="flex-1 pb-8">
                   <h4 className="font-semibold text-gray-900 mb-1">Contract Started</h4>
-                  <p className="text-sm text-gray-500">{contract.startDate}</p>
+                  <p className="text-sm text-gray-500">{contract.start_date}</p>
                 </div>
               </div>
 
@@ -194,7 +230,7 @@ const ContractDetail = () => {
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-gray-900 mb-1">Contract Ended</h4>
-                  <p className="text-sm text-gray-500">{contract.endDate}</p>
+                  <p className="text-sm text-gray-500">{contract.end_date}</p>
                 </div>
               </div>
             </div>

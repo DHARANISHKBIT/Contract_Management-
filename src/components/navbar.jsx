@@ -13,6 +13,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 const navigate = useNavigate();
 const role = localStorage.getItem("role");
+console.log("User role from localStorage:", role); // Debugging line
   const navItem = (name, label, Icon) => (
     <div
       onClick={() => {

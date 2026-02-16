@@ -1,27 +1,38 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AiOutlineClose, AiOutlineSave } from 'react-icons/ai';
+import axios from 'axios';
+
+// Helper function to format date from ISO string to yyyy-MM-dd
+const formatDateForInput = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 const EditContract = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const contract = location.state?.contract;
 
-  // If no contract data, redirect back to list
   if (!contract) {
     navigate('/contracts');
     return null;
   }
 
-  // Form state
   const [formData, setFormData] = useState({
-    name: contract.name || '',
-    type: contract.type || 'Service Contract',
-    client: contract.client || '',
-    startDate: contract.startDate || '',
-    endDate: contract.endDate || '',
-    value: contract.value.replace('$', '').replace(',', '') || '',
-    description: contract.description || ''
+    name: contract.contract_name || '',
+    type: contract.contract_type || 'Service Contract',
+    client: contract.client_name || '',
+    startDate: formatDateForInput(contract.start_date) || '',
+    endDate: formatDateForInput(contract.end_date) || '',
+    value: contract.amount || '',
+    description: contract.description || '',
+    userEmail: contract.assigned_user_email || '',
+    phoneNumber: contract.phone_number || ''
   });
 
   const handleChange = (e) => {
@@ -33,30 +44,60 @@ const EditContract = () => {
   };
 
   const handleCancel = () => {
-    navigate(-1); // Go back to previous page
+    navigate(-1);
   };
 
-  const handleSubmit = (e) => {
+  // ✅ UPDATE METHOD ADDED
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your update logic here
-    console.log('Updated contract data:', formData);
-    // Navigate back after successful update
-    navigate(-1);
+
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert("Authentication token not found. Please login again.");
+        navigate('/login');
+        return;
+      }
+
+      await axios.put(`http://localhost:5000/api/contracts/update/${contract._id}`, {
+        contract_name: formData.name,
+        contract_type: formData.type,
+        client_name: formData.client,
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        amount: formData.value,
+        description: formData.description,
+        assigned_user_email: formData.userEmail,
+        phone_number: formData.phoneNumber
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      alert("Contract Updated Successfully ✅");
+      navigate(-1);
+
+    } catch (error) {
+      console.error("Update Error:", error);
+      alert("Update Failed ❌");
+    }
   };
 
   return (
     <div className="min-h-screen bg-slate-100 p-6">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-xl shadow-sm p-8">
-          {/* Header */}
+
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Edit Contract</h1>
             <p className="text-gray-600">Update contract information</p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit}>
-            {/* Contract Name */}
+
             <div className="mb-6">
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Contract Name *
@@ -72,9 +113,7 @@ const EditContract = () => {
               />
             </div>
 
-            {/* Contract Type and Client/Vendor Name - Two columns */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {/* Contract Type */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Contract Type *
@@ -93,7 +132,6 @@ const EditContract = () => {
                 </select>
               </div>
 
-              {/* Client/Vendor Name */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Client/Vendor Name *
@@ -110,9 +148,40 @@ const EditContract = () => {
               </div>
             </div>
 
-            {/* Start Date and End Date - Two columns */}
+            {/* ✅ Email + Phone Added (Logic fixed, UI same) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {/* Start Date */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  name="userEmail"
+                  value={formData.userEmail}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Enter email"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Enter phone number"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Start Date *
@@ -127,7 +196,6 @@ const EditContract = () => {
                 />
               </div>
 
-              {/* End Date */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   End Date *
@@ -143,7 +211,6 @@ const EditContract = () => {
               </div>
             </div>
 
-            {/* Contract Value */}
             <div className="mb-6">
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Contract Value ($) *
@@ -161,7 +228,6 @@ const EditContract = () => {
               />
             </div>
 
-            {/* Description */}
             <div className="mb-8">
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Description *
@@ -177,7 +243,6 @@ const EditContract = () => {
               />
             </div>
 
-            {/* Action Buttons */}
             <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
               <button
                 type="button"
@@ -187,15 +252,17 @@ const EditContract = () => {
                 <AiOutlineClose size={18} />
                 Cancel
               </button>
+
               <button
                 type="submit"
-                style={{backgroundColor:"#5b5dfc"}}
+                style={{ backgroundColor: "#5b5dfc" }}
                 className="flex items-center gap-2 text-white px-6 py-3 rounded-lg hover:opacity-90 transition-colors font-medium"
               >
                 <AiOutlineSave size={18} />
                 Update Contract
               </button>
             </div>
+
           </form>
         </div>
       </div>

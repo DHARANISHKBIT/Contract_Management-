@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AiOutlineClose, AiOutlineSave } from 'react-icons/ai';
-import axios from "axios";   // ✅ ADDED
+import axios from "axios";
 
 const AddNewContract = () => {
   const navigate = useNavigate();
 
-  // Form state
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
+
   const [formData, setFormData] = useState({
     name: '',
     type: 'Service Contract',
@@ -14,7 +19,9 @@ const AddNewContract = () => {
     startDate: '',
     endDate: '',
     value: '',
-    description: ''
+    description: '',
+    userEmail: '',
+    phoneNumber: '',
   });
 
   const handleChange = (e) => {
@@ -29,17 +36,17 @@ const AddNewContract = () => {
     navigate('/contract-page');
   };
 
-  // ✅ API ADDED (UI NOT TOUCHED)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Please log in to create a contract.");
-        return;
-      }
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please log in to create a contract.");
+      navigate("/login");
+      return;
+    }
 
+    try {
       const response = await axios.post(
         "http://localhost:5000/api/contracts/create",
         {
@@ -49,8 +56,10 @@ const AddNewContract = () => {
           start_date: formData.startDate,
           end_date: formData.endDate,
           status: "Pending",
-          amount: formData.value,
+          amount: Number(formData.value),
           description: formData.description,
+          assigned_user_email: formData.userEmail,
+          phone_number: formData.phoneNumber,
         },
         {
           headers: {
@@ -60,16 +69,18 @@ const AddNewContract = () => {
         }
       );
 
-      console.log("Contract created:", response.data);
-
-      // Navigate back after successful creation
-      navigate('/contract-page');
-
+      if (response.data?.success) {
+        navigate("/contract-page");
+      } else {
+        alert(response.data?.message || "Failed to create contract");
+      }
     } catch (error) {
-      console.error(
-        "Error creating contract:",
-        error.response?.data || error.message
-      );
+      if (error.response?.status === 401) {
+        alert("Session expired or invalid. Please log in again.");
+        navigate("/login");
+        return;
+      }
+      console.error("Error creating contract:", error.response?.data || error.message);
       alert(error.response?.data?.message || "Failed to create contract");
     }
   };
@@ -78,7 +89,7 @@ const AddNewContract = () => {
     <div className="min-h-screen bg-slate-100 p-6">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-xl shadow-sm p-8">
-          {/* Header */}
+
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Add New Contract
@@ -88,8 +99,8 @@ const AddNewContract = () => {
             </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit}>
+
             {/* Contract Name */}
             <div className="mb-6">
               <label className="block text-sm font-semibold text-gray-900 mb-2">
@@ -108,6 +119,7 @@ const AddNewContract = () => {
 
             {/* Contract Type and Client/Vendor Name */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Contract Type *
@@ -142,6 +154,39 @@ const AddNewContract = () => {
                   placeholder="Enter client or vendor name"
                 />
               </div>
+
+              {/* Assign contract to another user (by their registered email) */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  Assign to user (email) *
+                </label>
+                <input
+                  type="email"
+                  name="userEmail"
+                  value={formData.userEmail}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Registered email of user to assign"
+                />
+              </div>
+
+              {/* ✅ NEW FIELD - PHONE NUMBER */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Enter phone number"
+                />
+              </div>
+
             </div>
 
             {/* Dates */}
@@ -156,7 +201,7 @@ const AddNewContract = () => {
                   value={formData.startDate}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                 />
               </div>
 
@@ -170,51 +215,46 @@ const AddNewContract = () => {
                   value={formData.endDate}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                 />
               </div>
             </div>
-
-            {/* Contract Value */}
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
+              Contract Value *
+            </label>
+            {/* Value */}
             <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Contract Value ($) *
-              </label>
               <input
                 type="number"
                 name="value"
                 value={formData.value}
                 onChange={handleChange}
                 required
-                min="0"
-                step="0.01"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                 placeholder="Enter contract value"
               />
             </div>
-
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
+              Description *
+            </label>
             {/* Description */}
             <div className="mb-8">
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Description *
-              </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
                 required
                 rows="4"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                 placeholder="Enter contract description"
               />
             </div>
 
-            {/* Action Buttons */}
             <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
               <button
                 type="button"
                 onClick={handleCancel}
-                className="flex items-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                className="flex items-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
               >
                 <AiOutlineClose size={18} />
                 Cancel
@@ -223,12 +263,13 @@ const AddNewContract = () => {
               <button
                 type="submit"
                 style={{ backgroundColor: "#5b5dfc" }}
-                className="flex items-center gap-2 text-white px-6 py-3 rounded-lg hover:opacity-90 transition-colors font-medium"
+                className="flex items-center gap-2 text-white px-6 py-3 rounded-lg hover:opacity-90 font-medium"
               >
                 <AiOutlineSave size={18} />
                 Create Contract
               </button>
             </div>
+
           </form>
         </div>
       </div>

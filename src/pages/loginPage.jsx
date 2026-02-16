@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/button";
+import { MdLogin } from "react-icons/md";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export default function Login() {
         console.log("Token stored:", data.token); // Debug log
         localStorage.setItem("role", data.user.role);
         localStorage.setItem("id", data.user.id);
+        localStorage.setItem("assigned_to", data.user.assigned_to);
         localStorage.setItem("isLoggedIn", "true");
 
         alert("Login successful");
@@ -33,7 +35,7 @@ export default function Login() {
         if (data.user.role === "admin") {
           navigate("/admin-dashboard");
         } else {
-          navigate("/user-dashboard");
+          navigate("/admin-dashboard");
         }
       } else {
         alert(data.message);
@@ -47,7 +49,10 @@ export default function Login() {
  
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
+        <div className="flex flex-col items-center   mb-6 bg-blue-700 w-20 h-20 rounded-full justify-center">
+            <MdLogin className="text-4xl text-white " />
+        </div>
         <h2 className="text-2xl font-bold text-center">
           Contract Management System
         </h2>

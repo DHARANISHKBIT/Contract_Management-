@@ -34,9 +34,11 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    setRole(localStorage.getItem("role") || "admin");
     if (!token) {
       setError("Please log in to view the dashboard.");
       setLoading(false);
@@ -94,12 +96,17 @@ export default function AdminDashboard() {
     status: c.status,
   }));
 
+  const isUser = role === "user";
   return (
     <div className="min-h-screen bg-slate-100">
       <div className="p-6">
-        <h2 className="text-2xl font-bold">Dashboard Overview</h2>
+        <h2 className="text-2xl font-bold">
+          {isUser ? "Assigned to you" : "Dashboard Overview"}
+        </h2>
         <div className="mb-4">
-          Welcome back! Here&apos;s your contract summary
+          {isUser
+            ? "Contracts assigned to you"
+            : "Welcome back! Here's your contract summary"}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
