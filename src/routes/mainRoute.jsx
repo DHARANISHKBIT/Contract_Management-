@@ -6,7 +6,8 @@ import ContractsTable from "../pages/contractPage";
 import ContractDetail from "../pages/viewContract";
 import EditContract from "../pages/editContract";
 import AddNewContract from "../pages/addNewContract";
-
+import AdminMeetingPage from "../pages/adminMeeting";
+import UserMeetingPage from "../pages/userMeeting";
 export default function MainRoute() {
   return (
     <Routes>
@@ -17,8 +18,8 @@ export default function MainRoute() {
       <Route path="/view-contract-page/:id" element={<ContractDetail />} />
        <Route path="/edit-contract/:id" element={<EditContract />} />
        <Route path="/addnew-contract" element={<AddNewContract />} />
-
-
+       <Route path="/admin-meeting" element={<AdminMeetingPage/>} />
+       <Route path="/user-meeting" element={<UserMeetingPage/>} />
     </Routes>
   );
 }

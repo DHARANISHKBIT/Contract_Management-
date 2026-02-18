@@ -7,6 +7,8 @@ import {
 import { FiMenu, FiX } from "react-icons/fi";
 import { IoIosLogOut } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { SiGooglemeet } from "react-icons/si";
+import { IoPersonCircle } from "react-icons/io5";
 
 export default function Navbar() {
   const [active, setActive] = useState("dashboard");
@@ -19,7 +21,9 @@ console.log("User role from localStorage:", role); // Debugging line
       onClick={() => {
         setActive(name);
         setOpen(false);
-        navigate(name === "dashboard" ? "/admin-dashboard" : "/contract-page");
+        if(name === "dashboard") navigate("/admin-dashboard");
+        else if(name === "contracts") navigate("/contract-page");
+        else if(name === "meetings") if (role == 'admin' ? navigate("/admin-meeting") : navigate("/user-meeting"));
       }}
       className={`flex items-center  gap-2 px-4 py-2 rounded-lg cursor-pointer
         ${
@@ -55,12 +59,15 @@ console.log("User role from localStorage:", role); // Debugging line
           </div>
         </div>
 
+         </div>
         {/* Desktop Nav */}
-        <nav className="hidden md:flex gap-4">
+        <nav className="hidden md:flex gap-14">
           {navItem("dashboard", "Dashboard", MdOutlineDashboard)}
           {navItem("contracts", "Contracts", FiMenu)}
+          {navItem("meetings", "Meetings", SiGooglemeet)}
+          {navItem("customers", "Customers", IoPersonCircle)}
+
         </nav>
-         </div>
 
         {/* Right (Desktop) */}
         <div className="hidden md:flex items-center gap-4">
