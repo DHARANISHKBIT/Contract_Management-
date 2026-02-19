@@ -38,7 +38,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setRole(localStorage.getItem("role") || "admin");
+    setRole(localStorage.getItem("role"));
     if (!token) {
       setError("Please log in to view the dashboard.");
       setLoading(false);
