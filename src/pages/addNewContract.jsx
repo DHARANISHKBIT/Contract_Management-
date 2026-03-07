@@ -133,6 +133,7 @@ const AddNewContract = () => {
                 >
                   <option value="Service Contract">Service Contract</option>
                   <option value="Vendor Contract">Vendor Contract</option>
+                  <option value="Rental Contract">Rental Contract</option>
                   <option value="Employment Contract">Employment Contract</option>
                   <option value="Partnership Agreement">Partnership Agreement</option>
                   <option value="Lease Agreement">Lease Agreement</option>

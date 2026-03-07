@@ -19,6 +19,7 @@ export default function AddMeetingPage() {
   const [contracts, setContracts] = useState([]);
   const [loadingContracts, setLoadingContracts] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
   const [form, setForm] = useState({
     contract_id: "",
     title: "",
@@ -27,6 +28,7 @@ export default function AddMeetingPage() {
     time: "",
     duration: "30",
     status: "scheduled",
+    meeting_link: "",
   });
 
   useEffect(() => {
@@ -85,6 +87,7 @@ export default function AddMeetingPage() {
         meeting_time: form.time,
         duration: Number(form.duration),
         status: form.status,
+        meeting_link: form.meeting_link?.trim() || "",
       };
       const res = await axios.post(MEETINGS_API + "/create", payload, {
         headers: {
@@ -189,6 +192,20 @@ export default function AddMeetingPage() {
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:bg-white focus:ring-2 focus:ring-slate-900/10 transition-all resize-none"
               />
             </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                <RiVideoAddLine size={13} /> Google Meet link (optional)
+              </label>
+              <input
+                type="url"
+                name="meeting_link"
+                value={form.meeting_link}
+                onChange={handleChange}
+                placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:bg-white focus:ring-2 focus:ring-slate-900/10 transition-all"
+              />
+              <p className="text-slate-500 text-xs">Paste the meeting link so users can join from their meeting list.</p>
+            </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
@@ -264,6 +281,7 @@ export default function AddMeetingPage() {
               type="submit"
               form="add-meeting-form"
               disabled={submitting || contracts.length === 0}
+              style={{backgroundColor:"#6a6cfc"}}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <RiVideoAddLine size={16} />

@@ -23,6 +23,7 @@ function mapMeetingToUI(m) {
     time: m.meeting_time || "",
     duration: m.duration ?? 30,
     host,
+    meeting_link: m.meeting_link || "",
   };
 }
 
@@ -79,9 +80,6 @@ export default function UserMeetingPage() {
     all: meetings.length,
   };
 
-  const handleJoinMeeting = (meetingId, status) => {
-    alert(`Joining meeting ${meetingId}... (integrate with your video provider)`);
-  };
 
   if (loading) {
     return (
@@ -154,9 +152,8 @@ export default function UserMeetingPage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all ${
-                activeTab === tab.key ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50'
-              }`}
+              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all ${activeTab === tab.key ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50'
+                }`}
             >
               {tab.label}
             </button>
@@ -175,9 +172,8 @@ export default function UserMeetingPage() {
                     {meeting.title}
                   </h3>
                   <span
-                    className={`ml-2 px-3 py-1 rounded-full text-xs font-semibold text-white flex-shrink-0 ${
-                      meeting.status === 'scheduled' ? 'bg-blue-500' : 'bg-emerald-500'
-                    }`}
+                    className={`ml-2 px-3 py-1 rounded-full text-xs font-semibold text-white  ${meeting.status === 'scheduled' ? 'bg-blue-500' : 'bg-emerald-500'
+                      }`}
                   >
                     {meeting.status === 'scheduled' ? 'scheduled' : 'ongoing'}
                   </span>
@@ -202,12 +198,14 @@ export default function UserMeetingPage() {
                   <span className="text-gray-700">Host: {meeting.host}</span>
                 </div>
               </div>
-              <button
-                onClick={() => handleJoinMeeting(meeting.id, meeting.status)}
-                className="w-full py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors"
+              <a
+                href={meeting.meeting_link}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="block w-full py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors text-center"
               >
                 {meeting.status === 'ongoing' ? 'Join Now' : 'Join Meeting'}
-              </button>
+              </a>
             </div>
           ))}
         </div>

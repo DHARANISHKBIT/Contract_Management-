@@ -19,6 +19,7 @@ function mapMeetingToUI(m) {
     duration: m.duration ?? 30,
     host,
     contract_name: m.contract_id?.contract_name,
+    meeting_link: m.meeting_link || "",
   };
 }
 
@@ -31,6 +32,7 @@ export default function AdminMeetingPage() {
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -88,6 +90,7 @@ export default function AdminMeetingPage() {
         meeting_date: editingMeeting.date,
         meeting_time: editingMeeting.time,
         duration: Number(editingMeeting.duration),
+        meeting_link: editingMeeting.meeting_link?.trim() || "",
       };
       const res = await axios.put(`${API_BASE}/${editingMeeting.id}`, payload, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -195,6 +198,7 @@ export default function AdminMeetingPage() {
             <p className="text-slate-600 text-lg">Manage all meetings and participants</p>
           </div>
           <button
+          style={{backgroundColor:"#6a6cfc"}}
             onClick={() => navigate("/add-meeting")}
             className="bg-slate-900 text-white px-6 py-3 rounded-xl hover:bg-slate-800 transition-all flex items-center gap-2 font-medium shadow-lg"
           >
@@ -373,12 +377,22 @@ export default function AdminMeetingPage() {
                   <option value="completed">Completed</option>
                 </select>
               </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-900 mb-2">Google Meet link (optional)</label>
+                <input
+                  type="url"
+                  value={editingMeeting.meeting_link || ""}
+                  onChange={(e) => handleInputChange('meeting_link', e.target.value)}
+                  placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900"
+                />
+              </div>
             </div>
             <div className="sticky bottom-0 bg-slate-50 border-t border-slate-200 px-6 py-4 flex items-center justify-end gap-3 rounded-b-2xl">
               <button onClick={handleCloseModal} className="px-6 py-3 text-slate-700 font-medium hover:bg-slate-200 rounded-xl transition-colors">
                 Cancel
               </button>
-              <button onClick={handleUpdateMeeting} className="px-6 py-3 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition-all shadow-lg">
+              <button onClick={handleUpdateMeeting} style={{backgroundColor:"#6a6cfc"}} className="px-6 py-3 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition-all shadow-lg">
                 Update Meeting
               </button>
             </div>
