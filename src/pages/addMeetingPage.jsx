@@ -252,7 +252,7 @@ export default function AddMeetingPage() {
               </select>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            {/* <div className="flex flex-col gap-1.5">
               <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                 Status
               </label>
@@ -266,7 +266,7 @@ export default function AddMeetingPage() {
                 <option value="ongoing">Ongoing</option>
                 <option value="completed">Completed</option>
               </select>
-            </div>
+            </div> */}
           </form>
 
           <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">

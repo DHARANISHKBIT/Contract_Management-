@@ -235,7 +235,7 @@ export default function AdminMeetingPage() {
           </div>
         </div>
 
-        <div className="flex gap-3 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-slate-200">
+        <div style={{color:"black"}} className="flex gap-3 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-slate-200">
           {[
             { key: 'all', label: `All (${counts.all})` },
             { key: 'scheduled', label: `Scheduled (${counts.scheduled})` },
@@ -246,7 +246,7 @@ export default function AdminMeetingPage() {
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all ${
-                activeTab === tab.key ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-600 hover:bg-slate-50'
+                activeTab === tab.key ? 'bg-slate-900 text-black shadow-lg' : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
               {tab.label}
@@ -367,15 +367,6 @@ export default function AdminMeetingPage() {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-900 mb-2">Status</label>
-                <select
-                  value={editingMeeting.status}
-                  onChange={(e) => handleInputChange('status', e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 appearance-none bg-white"
-                >
-                  <option value="scheduled">Scheduled</option>
-                  <option value="ongoing">Ongoing</option>
-                  <option value="completed">Completed</option>
-                </select>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-900 mb-2">Google Meet link (optional)</label>

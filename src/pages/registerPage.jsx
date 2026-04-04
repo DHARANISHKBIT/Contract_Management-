@@ -9,6 +9,8 @@ export default function Register() {
     username: "",
     email: "",
     password: "",
+    // role can be 'admin' (organization) or 'user' (vendor)
+    role: "user",
   });
 
   const handleChange = (e) => {
@@ -67,6 +69,16 @@ export default function Register() {
             className="w-full px-4 py-2 border rounded-lg"
             onChange={handleChange}
           />
+
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg"
+          >
+            <option value="user">Vendor</option>
+            <option value="admin">Organization (admin)</option>
+          </select>
 
           <Button text="Register" type="submit" />
         </form>

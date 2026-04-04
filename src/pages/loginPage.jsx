@@ -12,13 +12,21 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/api/users/login", {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+      const res = await fetch(`${apiBase}/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({
+          // Send only username + password (required by backend)
+          username,
+          password,
+        }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error(data?.message || "Login failed");
+      }
 
       if (data.success) {
         // ✅ store data in localStorage
@@ -26,7 +34,6 @@ export default function Login() {
         console.log("Token stored:", data.token); // Debug log
         localStorage.setItem("role", data.user.role);
         localStorage.setItem("id", data.user.id);
-        localStorage.setItem("assigned_to", data.user.assigned_to);
         localStorage.setItem("isLoggedIn", "true");
 
         alert("Login successful");

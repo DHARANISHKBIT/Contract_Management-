@@ -9,6 +9,7 @@ import AddNewContract from "../pages/addNewContract";
 import AdminMeetingPage from "../pages/adminMeeting";
 import UserMeetingPage from "../pages/userMeeting";
 import AddMeetingPage from "../pages/addMeetingPage";
+import AdminUsers from "../pages/adminUsers";
 export default function MainRoute() {
   return (
     <Routes>
@@ -22,6 +23,7 @@ export default function MainRoute() {
       <Route path="/admin-meeting" element={<AdminMeetingPage />} />
       <Route path="/user-meeting" element={<UserMeetingPage />} />
       <Route path="/add-meeting" element={<AddMeetingPage />} />
+      <Route path="/admin-users" element={<AdminUsers />} />
     </Routes>
   );
 }
