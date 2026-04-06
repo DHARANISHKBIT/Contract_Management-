@@ -10,9 +10,10 @@ import {
   RiFileTextLine,
 } from "react-icons/ri";
 import axios from "axios";
+import { API_BASE } from "../config/api";
 
-const MEETINGS_API = "http://localhost:5000/api/meetings";
-const CONTRACTS_API = "http://localhost:5000/api/contracts/allcontract";
+const MEETINGS_API = `${API_BASE}/meetings`;
+const CONTRACTS_API = `${API_BASE}/contracts/allcontract`;
 
 export default function AddMeetingPage() {
   const navigate = useNavigate();

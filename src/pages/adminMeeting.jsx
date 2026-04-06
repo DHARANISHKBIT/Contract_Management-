@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiPlus, FiCalendar, FiClock, FiVideo, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { MdOutlineCancel } from "react-icons/md";
 import axios from "axios";
+import { API_BASE } from "../config/api";
 
-const API_BASE = "http://localhost:5000/api/meetings";
+const MEETINGS_API = `${API_BASE}/meetings`;
 
 function mapMeetingToUI(m) {
   const dateStr = m.meeting_date ? new Date(m.meeting_date).toISOString().slice(0, 10) : "";
@@ -42,7 +43,7 @@ export default function AdminMeetingPage() {
     }
     const fetchMeetings = async () => {
       try {
-        const res = await axios.get(API_BASE, {
+        const res = await axios.get(MEETINGS_API, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data.success && Array.isArray(res.data.data)) {
@@ -92,7 +93,7 @@ export default function AdminMeetingPage() {
         duration: Number(editingMeeting.duration),
         meeting_link: editingMeeting.meeting_link?.trim() || "",
       };
-      const res = await axios.put(`${API_BASE}/${editingMeeting.id}`, payload, {
+      const res = await axios.put(`${MEETINGS_API}/${editingMeeting.id}`, payload, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       if (res.data.success) {
@@ -120,7 +121,7 @@ export default function AdminMeetingPage() {
       return;
     }
     try {
-      const res = await axios.delete(`${API_BASE}/${id}`, {
+      const res = await axios.delete(`${MEETINGS_API}/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data.success) {
@@ -173,7 +174,7 @@ export default function AdminMeetingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4">
         <p className="text-slate-600">Loading meetings...</p>
       </div>
     );
@@ -181,26 +182,26 @@ export default function AdminMeetingPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <p className="text-red-600">{error}</p>
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4">
+        <p className="text-red-600 text-center">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex items-start justify-between">
-          <div>
-            <h1 className="text-5xl font-bold text-slate-900 mb-2 tracking-tight">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto w-full min-w-0">
+        <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-2 tracking-tight">
               Admin Meetings
             </h1>
-            <p className="text-slate-600 text-lg">Manage all meetings and participants</p>
+            <p className="text-slate-600 text-base sm:text-lg">Manage all meetings and participants</p>
           </div>
           <button
-          style={{backgroundColor:"#6a6cfc"}}
+            style={{ backgroundColor: "#6a6cfc" }}
             onClick={() => navigate("/add-meeting")}
-            className="bg-slate-900 text-white px-6 py-3 rounded-xl hover:bg-slate-800 transition-all flex items-center gap-2 font-medium shadow-lg"
+            className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 rounded-xl text-white font-medium shadow-lg hover:opacity-95 transition-all"
           >
             <FiPlus size={20} />
             Create Meeting
@@ -220,22 +221,22 @@ export default function AdminMeetingPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-6 shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-linear-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-4 sm:p-6 shadow-sm">
             <div className="text-4xl font-bold text-blue-900 mb-1">{counts.scheduled}</div>
             <div className="text-blue-700 font-medium">Scheduled Meetings</div>
           </div>
-          <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-2xl p-6 shadow-sm">
+          <div className="bg-linear-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-2xl p-4 sm:p-6 shadow-sm">
             <div className="text-4xl font-bold text-emerald-900 mb-1">{counts.ongoing}</div>
             <div className="text-emerald-700 font-medium">Ongoing Meetings</div>
           </div>
-          <div className="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <div className="bg-linear-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
             <div className="text-4xl font-bold text-slate-900 mb-1">{counts.completed}</div>
             <div className="text-slate-700 font-medium">Completed Meetings</div>
           </div>
         </div>
 
-        <div style={{color:"black"}} className="flex gap-3 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-slate-200">
+        <div className="flex gap-2 sm:gap-3 mb-6 sm:mb-8 bg-white p-2 rounded-2xl shadow-sm border border-slate-200 overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
           {[
             { key: 'all', label: `All (${counts.all})` },
             { key: 'scheduled', label: `Scheduled (${counts.scheduled})` },
@@ -244,9 +245,10 @@ export default function AdminMeetingPage() {
           ].map((tab) => (
             <button
               key={tab.key}
+              type="button"
               onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all ${
-                activeTab === tab.key ? 'bg-slate-900 text-black shadow-lg' : 'text-slate-600 hover:bg-slate-50'
+              className={`shrink-0 min-w-[4.75rem] sm:flex-1 py-2.5 sm:py-3 px-3 sm:px-5 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                activeTab === tab.key ? "bg-slate-900 text-black shadow-lg" : "text-slate-600 hover:bg-slate-50"
               }`}
             >
               {tab.label}
@@ -254,11 +256,11 @@ export default function AdminMeetingPage() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
           {filteredMeetings.map((meeting) => (
             <div
               key={meeting.id}
-              className={`bg-white border-2 rounded-2xl p-6 hover:shadow-xl transition-all hover:-translate-y-1 ${getStatusBg(meeting.status)}`}
+              className={`bg-white border-2 rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-all sm:hover:-translate-y-1 ${getStatusBg(meeting.status)}`}
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
@@ -303,18 +305,18 @@ export default function AdminMeetingPage() {
       </div>
 
       {isEditModalOpen && editingMeeting && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900">Edit Meeting</h2>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl max-w-xl w-full max-h-[92vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-2xl sm:rounded-t-2xl gap-2">
+              <div className="min-w-0">
+                <h2 className="text-lg sm:text-2xl font-bold text-slate-900 truncate">Edit Meeting</h2>
                 <p className="text-slate-600 text-sm mt-1">Update the meeting details below.</p>
               </div>
               <button onClick={handleCloseModal} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
                 <MdOutlineCancel className="text-slate-600 text-3xl" />
               </button>
             </div>
-            <div className="p-6 space-y-5">
+            <div className="p-4 sm:p-6 space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-slate-900 mb-2">Meeting Title</label>
                 <input
@@ -333,7 +335,7 @@ export default function AdminMeetingPage() {
                   className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 resize-none"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-slate-900 mb-2">Date</label>
                   <input
@@ -366,9 +368,6 @@ export default function AdminMeetingPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-900 mb-2">Status</label>
-              </div>
-              <div>
                 <label className="block text-sm font-semibold text-slate-900 mb-2">Google Meet link (optional)</label>
                 <input
                   type="url"
@@ -379,11 +378,11 @@ export default function AdminMeetingPage() {
                 />
               </div>
             </div>
-            <div className="sticky bottom-0 bg-slate-50 border-t border-slate-200 px-6 py-4 flex items-center justify-end gap-3 rounded-b-2xl">
-              <button onClick={handleCloseModal} className="px-6 py-3 text-slate-700 font-medium hover:bg-slate-200 rounded-xl transition-colors">
+            <div className="sticky bottom-0 bg-slate-50 border-t border-slate-200 px-4 sm:px-6 py-4 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 rounded-b-2xl">
+              <button onClick={handleCloseModal} className="w-full sm:w-auto px-6 py-3 text-slate-700 font-medium hover:bg-slate-200 rounded-xl transition-colors">
                 Cancel
               </button>
-              <button onClick={handleUpdateMeeting} style={{backgroundColor:"#6a6cfc"}} className="px-6 py-3 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition-all shadow-lg">
+              <button onClick={handleUpdateMeeting} style={{ backgroundColor: "#6a6cfc" }} className="w-full sm:w-auto px-6 py-3 text-white font-medium rounded-xl hover:opacity-95 transition-all shadow-lg">
                 Update Meeting
               </button>
             </div>

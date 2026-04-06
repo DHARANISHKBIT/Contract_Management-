@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AiOutlineClose, AiOutlineSave } from 'react-icons/ai';
 import axios from "axios";
+import { API_BASE } from "../config/api";
 
 const AddNewContract = () => {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const AddNewContract = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/contracts/create",
+        `${API_BASE}/contracts/create`,
         {
           contract_name: formData.name,
           contract_type: formData.type,

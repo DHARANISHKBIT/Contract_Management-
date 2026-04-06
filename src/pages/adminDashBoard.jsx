@@ -9,6 +9,7 @@ import { GiConfirmed } from "react-icons/gi";
 import { LuClock } from "react-icons/lu";
 import { MdOutlineAttachMoney } from "react-icons/md";
 import StatusDistribution from "../components/StatusDistribution";
+import { API_BASE } from "../config/api";
 
 const TYPE_COLORS = [
   { barColor: "#2563eb", trackColor: "#eff6ff" },
@@ -45,7 +46,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    fetch("http://localhost:5000/api/contracts/dashboard", {
+    fetch(`${API_BASE}/contracts/dashboard`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

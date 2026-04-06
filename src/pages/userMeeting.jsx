@@ -8,8 +8,9 @@ import {
   FiCircle,
 } from 'react-icons/fi';
 import axios from "axios";
+import { API_BASE } from "../config/api";
 
-const API_BASE = "http://localhost:5000/api/meetings";
+const MEETINGS_API = `${API_BASE}/meetings`;
 
 function mapMeetingToUI(m) {
   const dateStr = m.meeting_date ? new Date(m.meeting_date).toISOString().slice(0, 10) : "";
@@ -43,7 +44,7 @@ export default function UserMeetingPage() {
     }
     const fetchMeetings = async () => {
       try {
-        const res = await axios.get(API_BASE, {
+        const res = await axios.get(MEETINGS_API, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data.success && Array.isArray(res.data.data)) {
@@ -83,7 +84,7 @@ export default function UserMeetingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <p className="text-gray-600">Loading meetings...</p>
       </div>
     );
@@ -91,18 +92,18 @@ export default function UserMeetingPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-red-600">{error}</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <p className="text-red-600 text-center">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Available Meetings</h1>
-          <p className="text-gray-600 text-lg">Browse and join upcoming meetings</p>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto w-full min-w-0">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-2">Available Meetings</h1>
+          <p className="text-gray-600 text-base sm:text-lg">Browse and join upcoming meetings</p>
         </div>
 
         <div className="mb-8">
@@ -118,8 +119,8 @@ export default function UserMeetingPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-6 mb-8">
-          <div className="bg-blue-50 border border-blue-100 rounded-xl p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 sm:p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-blue-100 rounded-lg">
                 <FiCalendar size={28} className="text-blue-600" />
@@ -130,7 +131,7 @@ export default function UserMeetingPage() {
               </div>
             </div>
           </div>
-          <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-6">
+          <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 sm:p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-emerald-100 rounded-lg relative">
                 <FiCircle size={28} className="text-emerald-600 fill-emerald-600" />
@@ -143,39 +144,46 @@ export default function UserMeetingPage() {
           </div>
         </div>
 
-        <div className="flex gap-3 mb-8 bg-white p-2 rounded-xl border border-gray-200">
+        <div className="flex gap-2 sm:gap-3 mb-6 sm:mb-8 bg-white p-2 rounded-xl border border-gray-200 overflow-x-auto [-webkit-overflow-scrolling:touch]">
           {[
-            { key: 'all', label: `All Meetings (${counts.all})` },
+            { key: 'all', label: `All (${counts.all})` },
             { key: 'upcoming', label: `Upcoming (${counts.upcoming})` },
-            { key: 'live', label: `Live Now (${counts.live})` },
+            { key: 'live', label: `Live (${counts.live})` },
           ].map((tab) => (
             <button
               key={tab.key}
+              type="button"
               onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all ${activeTab === tab.key ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50'
-                }`}
+              className={`shrink-0 min-w-[5rem] sm:flex-1 py-2.5 sm:py-3 px-3 sm:px-5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                activeTab === tab.key ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-50"
+              }`}
             >
               {tab.label}
             </button>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
           {filteredMeetings.map((meeting) => (
             <div
               key={meeting.id}
-              className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all"
+              className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all"
             >
               <div className="mb-4">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-bold text-gray-900 text-lg leading-tight flex-1">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <h3 className="font-bold text-gray-900 text-base sm:text-lg leading-tight flex-1 min-w-0 break-words">
                     {meeting.title}
                   </h3>
                   <span
-                    className={`ml-2 px-3 py-1 rounded-full text-xs font-semibold text-white  ${meeting.status === 'scheduled' ? 'bg-blue-500' : 'bg-emerald-500'
-                      }`}
+                    className={`shrink-0 px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold text-white ${
+                      meeting.status === "scheduled"
+                        ? "bg-blue-500"
+                        : meeting.status === "ongoing"
+                          ? "bg-emerald-500"
+                          : "bg-gray-500"
+                    }`}
                   >
-                    {meeting.status === 'scheduled' ? 'scheduled' : 'ongoing'}
+                    {meeting.status}
                   </span>
                 </div>
                 <p className="text-gray-600 text-sm leading-relaxed">
@@ -199,12 +207,21 @@ export default function UserMeetingPage() {
                 </div>
               </div>
               <a
-                href={meeting.meeting_link}
+                href={meeting.status === "completed" ? undefined : meeting.meeting_link}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="block w-full py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors text-center"
+                onClick={(e) => {
+                  if (meeting.status === "completed") e.preventDefault();
+                }}
+                className={`flex w-full py-3 min-h-[44px] items-center justify-center bg-gray-900 text-white font-semibold rounded-xl transition-colors text-center ${
+                  meeting.status === "completed" ? "opacity-60 pointer-events-none cursor-not-allowed" : "hover:bg-gray-800"
+                }`}
               >
-                {meeting.status === 'ongoing' ? 'Join Now' : 'Join Meeting'}
+                {meeting.status === "ongoing"
+                  ? "Join Now"
+                  : meeting.status === "scheduled"
+                    ? "Join Meeting"
+                    : "Meeting ended"}
               </a>
             </div>
           ))}

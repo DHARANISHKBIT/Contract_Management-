@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FiExternalLink, FiInfo, FiPlus, FiRefreshCw, FiTrash2 } from "react-icons/fi";
+import { API_BASE } from "../config/api";
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") || "http://localhost:5000";
-const USERS_API = `${API_BASE}/api/users`;
+const USERS_API = `${API_BASE}/users`;
 const ASSIGNED_USERS_URL = `${USERS_API}/assigned-to-my-contracts`;
 
 function isValidEmail(email) {
@@ -193,22 +192,31 @@ export default function AdminUsers() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-start justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-5xl font-bold text-slate-900 mb-2 tracking-tight">Users</h1>
-            <p className="text-slate-600 text-lg">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto w-full min-w-0">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6 sm:mb-8">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-2 tracking-tight">
+              Users
+            </h1>
+            <p className="text-slate-600 text-base sm:text-lg">
               Users assigned to your contracts — view details, add, or remove
             </p>
           </div>
-          <div className="flex items-center gap-3">
-           
+          <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 w-full sm:w-auto sm:shrink-0">
+            <button
+              type="button"
+              onClick={loadUsers}
+              className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all w-full sm:w-auto"
+            >
+              <FiRefreshCw />
+              Refresh
+            </button>
             <button
               type="button"
               style={{ backgroundColor: "#6a6cfc" }}
               onClick={() => setAddOpen(true)}
-              className="px-5 py-3 rounded-xl text-white font-medium shadow-lg hover:opacity-95 transition-all flex items-center gap-2"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-white font-medium shadow-lg hover:opacity-95 transition-all w-full sm:w-auto"
             >
               <FiPlus />
               Add new user
@@ -226,41 +234,80 @@ export default function AdminUsers() {
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-          <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-slate-50 border-b border-slate-200 text-sm font-semibold text-slate-700">
-            <div className="col-span-3">Username</div>
-            <div className="col-span-4">Email</div>
-            <div className="col-span-2">Role</div>
-            <div className="col-span-3 text-right">Actions</div>
+          {/* Desktop table */}
+          <div className="hidden md:block">
+            <div className="grid grid-cols-12 gap-4 px-4 lg:px-6 py-4 bg-slate-50 border-b border-slate-200 text-sm font-semibold text-slate-700">
+              <div className="col-span-3">Username</div>
+              <div className="col-span-4">Email</div>
+              <div className="col-span-2">Role</div>
+              <div className="col-span-3 text-right">Actions</div>
+            </div>
+            {filtered.map((u) => (
+              <div
+                key={u.id}
+                className="grid grid-cols-12 gap-4 px-4 lg:px-6 py-4 border-b border-slate-100 items-center hover:bg-slate-50"
+              >
+                <div className="col-span-3 font-semibold text-slate-900 truncate" title={u.username}>
+                  {u.username || "—"}
+                </div>
+                <div className="col-span-4 text-slate-700 break-all text-sm">{u.email || "—"}</div>
+                <div className="col-span-2 text-slate-800">{u.role || "user"}</div>
+                <div className="col-span-3 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    title="View details"
+                    onClick={() => setSelectedUser(u)}
+                    className="p-2.5 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition-colors"
+                  >
+                    <FiInfo className="text-xl" />
+                  </button>
+                  <button
+                    type="button"
+                    title="Delete user"
+                    onClick={(e) => handleDelete(u, e)}
+                    className="p-2.5 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-xl border border-red-200 bg-white text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <FiTrash2 className="text-xl" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {filtered.map((u) => (
-            <div
-              key={u.id}
-              className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-slate-100 items-center hover:bg-slate-50"
-            >
-              <div className="col-span-3 font-semibold text-slate-900">{u.username || "—"}</div>
-              <div className="col-span-4 text-slate-700 break-all">{u.email || "—"}</div>
-              <div className="col-span-2 text-slate-800">{u.role || "user"}</div>
-              <div className="col-span-3 flex justify-end gap-2">
-                <button
-                  type="button"
-                  title="View details"
-                  onClick={() => setSelectedUser(u)}
-                  className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition-colors"
-                >
-                  <FiInfo className="text-xl" />
-                </button>
-                <button
-                  type="button"
-                  title="Delete user"
-                  onClick={(e) => handleDelete(u, e)}
-                  className="p-2.5 rounded-xl border border-red-200 bg-white text-red-600 hover:bg-red-50 transition-colors"
-                >
-                  <FiTrash2 className="text-xl" />
-                </button>
+          {/* Mobile cards */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {filtered.map((u) => (
+              <div key={u.id} className="p-4 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-slate-900 break-words">{u.username || "—"}</p>
+                    <p className="text-sm text-slate-600 break-all mt-1">{u.email || "—"}</p>
+                  </div>
+                  <span className="shrink-0 text-xs font-medium uppercase px-2 py-1 rounded-lg bg-slate-100 text-slate-700">
+                    {u.role || "user"}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedUser(u)}
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 font-medium text-sm"
+                  >
+                    <FiInfo className="text-lg" />
+                    Details
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => handleDelete(u, e)}
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl border border-red-200 bg-white text-red-600 font-medium text-sm"
+                  >
+                    <FiTrash2 className="text-lg" />
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
 
           {filtered.length === 0 && (
             <div className="px-6 py-10 text-center text-slate-500">No users found.</div>
@@ -270,16 +317,16 @@ export default function AdminUsers() {
 
       {selectedUser && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50"
           onClick={() => setSelectedUser(null)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden"
+            className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-5 border-b border-slate-200 flex items-start justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900">User details</h2>
+            <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <h2 className="text-lg sm:text-2xl font-bold text-slate-900">User details</h2>
                 <p className="text-slate-600 text-sm mt-1">Information for this user</p>
               </div>
               <button
@@ -291,52 +338,63 @@ export default function AdminUsers() {
               </button>
             </div>
 
-            <div className="px-6 py-5 space-y-4">
-              <div className="grid grid-cols-3 gap-3">
+            <div className="px-4 sm:px-6 py-5 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-3">
                 <div className="text-sm font-semibold text-slate-700">Username</div>
-                <div className="col-span-2 text-slate-900">{selectedUser.username || "—"}</div>
+                <div className="sm:col-span-2 text-slate-900 break-words">{selectedUser.username || "—"}</div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-3">
                 <div className="text-sm font-semibold text-slate-700">Email</div>
-                <div className="col-span-2 text-slate-900 break-all">{selectedUser.email || "—"}</div>
+                <div className="sm:col-span-2 text-slate-900 break-all">{selectedUser.email || "—"}</div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-3">
                 <div className="text-sm font-semibold text-slate-700">Role</div>
-                <div className="col-span-2 text-slate-900">{selectedUser.role || "user"}</div>
+                <div className="sm:col-span-2 text-slate-900">{selectedUser.role || "user"}</div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-3">
                 <div className="text-sm font-semibold text-slate-700">Created</div>
-                <div className="col-span-2 text-slate-900">
+                <div className="sm:col-span-2 text-slate-900 text-sm">
                   {selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleString() : "—"}
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-3">
                 <div className="text-sm font-semibold text-slate-700">Updated</div>
-                <div className="col-span-2 text-slate-900">
+                <div className="sm:col-span-2 text-slate-900 text-sm">
                   {selectedUser.updatedAt ? new Date(selectedUser.updatedAt).toLocaleString() : "—"}
                 </div>
               </div>
             </div>
 
-         
+            <div className="px-4 sm:px-6 py-4 bg-slate-50 border-t border-slate-200">
+              <button
+                type="button"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all text-sm font-medium text-slate-800"
+                onClick={() => openDetailsForm(selectedUser.email)}
+              >
+                <FiExternalLink />
+                Open full details form
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {addOpen && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50"
           onClick={() => !addSubmitting && setAddOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
+            className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl max-w-md w-full max-h-[92vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 py-5 border-b border-slate-200">
-              <h2 className="text-2xl font-bold text-slate-900">Add new user</h2>
-             
+            <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200">
+              <h2 className="text-lg sm:text-2xl font-bold text-slate-900">Add new user</h2>
+              <p className="text-slate-600 text-sm mt-1">
+                Creates an account in the system. Assign the user on a contract to show them in this list.
+              </p>
             </div>
-            <form onSubmit={handleAddSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleAddSubmit} className="p-4 sm:p-6 space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-slate-900 mb-2">Username</label>
                 <input
@@ -375,15 +433,15 @@ export default function AdminUsers() {
                   className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 bg-white"
                 >
                   <option value="user">user</option>
-                 
+                  <option value="admin">admin</option>
                 </select>
               </div>
-              <div className="flex justify-end gap-3 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-2">
                 <button
                   type="button"
                   disabled={addSubmitting}
                   onClick={() => setAddOpen(false)}
-                  className="px-5 py-3 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50"
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50"
                 >
                   Cancel
                 </button>
@@ -391,7 +449,7 @@ export default function AdminUsers() {
                   type="submit"
                   disabled={addSubmitting}
                   style={{ backgroundColor: "#6a6cfc" }}
-                  className="px-5 py-3 rounded-xl text-white font-medium disabled:opacity-50"
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl text-white font-medium disabled:opacity-50"
                 >
                   {addSubmitting ? "Creating…" : "Create user"}
                 </button>

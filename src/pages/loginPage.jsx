@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/button";
 import { MdLogin } from "react-icons/md";
+import { API_BASE } from "../config/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -12,8 +13,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-      const res = await fetch(`${apiBase}/api/users/login`, {
+      const res = await fetch(`${API_BASE}/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

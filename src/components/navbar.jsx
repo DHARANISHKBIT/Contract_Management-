@@ -11,8 +11,9 @@ import { useNavigate } from "react-router-dom";
 import { SiGooglemeet } from "react-icons/si";
 import { IoPersonCircle } from "react-icons/io5";
 import axios from "axios";
+import { API_BASE } from "../config/api";
 
-const API = "http://localhost:5000/api/notifications";
+const NOTIFICATIONS_API = `${API_BASE}/notifications`;
 
 export default function Navbar() {
   const [active, setActive] = useState("dashboard");
@@ -28,14 +29,14 @@ export default function Navbar() {
 
   const fetchUnreadCount = () => {
     if (!token) return;
-    axios.get(`${API}/unread-count`, { headers: { Authorization: `Bearer ${token}` } })
+    axios.get(`${NOTIFICATIONS_API}/unread-count`, { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => { if (res.data?.success) setUnreadCount(res.data.count ?? 0); })
       .catch(() => {});
   };
 
   const fetchNotifications = () => {
     if (!token) return;
-    axios.get(API, { headers: { Authorization: `Bearer ${token}` } })
+    axios.get(NOTIFICATIONS_API, { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => {
         if (res.data?.success && Array.isArray(res.data.data)) setNotifications(res.data.data);
       })
@@ -63,7 +64,7 @@ export default function Navbar() {
 
   const markRead = (id) => {
     if (!token) return;
-    axios.patch(`${API}/${id}/read`, {}, { headers: { Authorization: `Bearer ${token}` } })
+    axios.patch(`${NOTIFICATIONS_API}/${id}/read`, {}, { headers: { Authorization: `Bearer ${token}` } })
       .then(() => {
         setNotifications((prev) => prev.map((n) => (n._id === id ? { ...n, read: true } : n)));
         setUnreadCount((c) => Math.max(0, c - 1));
@@ -73,7 +74,7 @@ export default function Navbar() {
 
   const markAllRead = () => {
     if (!token) return;
-    axios.patch(`${API}/read-all`, {}, { headers: { Authorization: `Bearer ${token}` } })
+    axios.patch(`${NOTIFICATIONS_API}/read-all`, {}, { headers: { Authorization: `Bearer ${token}` } })
       .then(() => {
         setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
         setUnreadCount(0);

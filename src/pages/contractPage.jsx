@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AiOutlineEye, AiOutlineEdit, AiOutlineDelete, AiOutlinePlus, AiOutlineSearch, AiOutlineFilter } from 'react-icons/ai';
 import axios from "axios";
+import { API_BASE } from "../config/api";
 
 const ContractsTable = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const ContractsTable = () => {
     const fetchContracts = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/contracts/allcontract",
+          `${API_BASE}/contracts/allcontract`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -84,7 +85,7 @@ const ContractsTable = () => {
 
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/contracts/${id}`,
+        `${API_BASE}/contracts/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.data.success) {
