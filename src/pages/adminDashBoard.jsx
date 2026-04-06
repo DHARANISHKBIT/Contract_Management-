@@ -1,29 +1,14 @@
 import React, { useState, useEffect } from "react";
 import StatCard from "../components/statCard";
 import RecentContracts from "../components/recentContracts";
-import StatusBox from "../components/statusBox";
 import { MdOutlineDescription } from "react-icons/md";
 import { VscError } from "react-icons/vsc";
 import { BiError } from "react-icons/bi";
 import { GiConfirmed } from "react-icons/gi";
 import { LuClock } from "react-icons/lu";
 import { MdOutlineAttachMoney } from "react-icons/md";
-import StatusDistribution from "../components/StatusDistribution";
+import DashboardCharts from "../components/dashboardCharts";
 import { API_BASE } from "../config/api";
-
-const TYPE_COLORS = [
-  { barColor: "#2563eb", trackColor: "#eff6ff" },
-  { barColor: "#16a34a", trackColor: "#dcfce7" },
-  { barColor: "#dc2626", trackColor: "#fee2e2" },
-  { barColor: "#ca8a04", trackColor: "#fef9c3" },
-  { barColor: "#9333ea", trackColor: "#f3e8ff" },
-];
-
-const STATUS_COLORS = {
-  Active: "bg-green-500",
-  Pending: "bg-yellow-500",
-  Expired: "bg-red-500",
-};
 
 function formatAmount(num) {
   if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(1)}M`;
@@ -76,18 +61,6 @@ export default function AdminDashboard() {
 
   const { stats, contractTypes, statusDistribution, recentContracts } = data;
   const total = stats?.total ?? 0;
-
-  const contractTypesForBox = (contractTypes || []).map((item, i) => ({
-    ...item,
-    barColor: TYPE_COLORS[i % TYPE_COLORS.length].barColor,
-    trackColor: TYPE_COLORS[i % TYPE_COLORS.length].trackColor,
-  }));
-
-  const statusItems = (statusDistribution || []).map((item) => ({
-    label: item.label,
-    value: item.value,
-    color: STATUS_COLORS[item.label] || "bg-gray-500",
-  }));
 
   const recentForList = (recentContracts || []).map((c) => ({
     title: c.contract_name,
@@ -155,12 +128,17 @@ export default function AdminDashboard() {
           />
         </div>
 
-        <RecentContracts contracts={recentForList} />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
-          <StatusBox title="Contract Types" items={contractTypesForBox} />
-          <StatusDistribution title="Status Distribution" items={statusItems} />
+        <div className="mt-10">
+          <h3 className="mb-4 text-lg font-semibold text-slate-800">
+            Charts overview
+          </h3>
+          <DashboardCharts
+            contractTypes={contractTypes}
+            statusDistribution={statusDistribution}
+          />
         </div>
+
+        <RecentContracts contracts={recentForList} />
       </div>
     </div>
   );
