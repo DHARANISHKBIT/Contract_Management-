@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AiOutlineClose, AiOutlineSave } from 'react-icons/ai';
 import axios from 'axios';
+import { API_BASE } from '../config/api';
 
 // Helper function to format date from ISO string to yyyy-MM-dd
 const formatDateForInput = (dateString) => {
@@ -60,7 +61,7 @@ const EditContract = () => {
         return;
       }
 
-      await axios.put(`http://localhost:5000/api/contracts/update/${contract._id}`, {
+      await axios.put(`${API_BASE}/contracts/update/${contract._id}`, {
         contract_name: formData.name,
         contract_type: formData.type,
         client_name: formData.client,

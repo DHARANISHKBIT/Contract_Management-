@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AiOutlineEye, AiOutlineEdit, AiOutlineDelete, AiOutlinePlus, AiOutlineSearch, AiOutlineFilter } from 'react-icons/ai';
 import axios from "axios";
+import { API_BASE } from "../config/api";
 
 const ContractsTable = () => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ const ContractsTable = () => {
   const [statusFilter, setStatusFilter] = useState('All Status');
   const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState(localStorage.getItem("role") || "admin");
+  const [role, setRole] = useState(() => localStorage.getItem("role") || "admin");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -17,12 +18,13 @@ const ContractsTable = () => {
       navigate("/login", { replace: true });
       return;
     }
-    setRole(localStorage.getItem("role") || "admin");
+    const storedRole = localStorage.getItem("role");
+    if (storedRole) setRole(storedRole);
 
     const fetchContracts = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/contracts/allcontract",
+          `${API_BASE}/contracts/allcontract`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -83,7 +85,7 @@ const ContractsTable = () => {
 
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/contracts/${id}`,
+        `${API_BASE}/contracts/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.data.success) {

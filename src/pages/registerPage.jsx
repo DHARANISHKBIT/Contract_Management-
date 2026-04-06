@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/button";
+import { API_BASE } from "../config/api";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -9,6 +10,8 @@ export default function Register() {
     username: "",
     email: "",
     password: "",
+    // role can be 'admin' (organization) or 'user' (vendor)
+    role: "user",
   });
 
   const handleChange = (e) => {
@@ -19,7 +22,7 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/api/users/register", {
+      const res = await fetch(`${API_BASE}/users/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -67,6 +70,16 @@ export default function Register() {
             className="w-full px-4 py-2 border rounded-lg"
             onChange={handleChange}
           />
+
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg"
+          >
+            <option value="user">Vendor</option>
+            <option value="admin">Organization (admin)</option>
+          </select>
 
           <Button text="Register" type="submit" />
         </form>

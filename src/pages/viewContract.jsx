@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { AiOutlineEdit, AiOutlineDelete, AiOutlineArrowLeft } from 'react-icons/ai';
 import { BsFileText, BsCurrencyDollar, BsCalendar, BsBuilding, BsClock } from 'react-icons/bs';
 import axios from "axios";
+import { API_BASE } from "../config/api";
 
 const ContractDetail = () => {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ const ContractDetail = () => {
   
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/contracts/${id}`,
+        `${API_BASE}/contracts/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
