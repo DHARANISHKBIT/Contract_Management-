@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import StatCard from "../components/statCard";
-import RecentContracts from "../components/RecentContracts";
+import RecentContracts from "../components/recentContracts";
 import StatusBox from "../components/statusBox";
 import { MdOutlineDescription } from "react-icons/md";
 import { VscError } from "react-icons/vsc";
